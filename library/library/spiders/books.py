@@ -1,6 +1,7 @@
 from typing import Generator
 import scrapy
 from scrapy.http import Response
+from ..items import BookItem
 
 
 class BooksSpider(scrapy.Spider):
@@ -23,12 +24,21 @@ class BooksSpider(scrapy.Spider):
         amount_in_stock = res.css("p.availability::text").re_first(r"\d+")
         rating_str = res.css("p.star-rating::attr(class)").get().split(" ")[-1]
         category = res.css("ul.breadcrumb > li:nth-child(3) a::text").get()
-        yield {
-            "title": res.css("div.product_main>h1::text").get(),
-            "price": res.css("p.price_color::text").get().replace("£", ""),
-            "amount_in_stock": amount_in_stock,
-            "rating": obj_rating[rating_str],
-            "category": category,
-            "description": res.css(".product_page > p::text").get(),
-            "upc": res.css(".table-striped tr:first-child > td::text").get(),
-        }
+        item = BookItem()
+        item["title"] = res.css("div.product_main>h1::text").get()
+        item["price"] = res.css("p.price_color::text").get().replace("£", "")
+        item["amount_in_stock"] = amount_in_stock
+        item["rating"] = obj_rating[rating_str]
+        item["category"] = category
+        item["description"] = res.css(".product_page > p::text").get()
+        item["upc"] = res.css(".table-striped tr:first-child > td::text").get()
+        yield item
+        # yield {
+        #     "title": res.css("div.product_main>h1::text").get(),
+        #     "price": res.css("p.price_color::text").get().replace("£", ""),
+        #     "amount_in_stock": amount_in_stock,
+        #     "rating": obj_rating[rating_str],
+        #     "category": category,
+        #     "description": res.css(".product_page > p::text").get(),
+        #     "upc": res.css(".table-striped tr:first-child > td::text").get(),
+        # }
