@@ -30,7 +30,7 @@ class BooksSpider(scrapy.Spider):
         item["amount_in_stock"] = amount_in_stock
         item["rating"] = obj_rating[rating_str]
         item["category"] = category
-        item["description"] = res.css(".product_page > p::text").get()
+        item["description"] = res.css("#product_description + p::text").get()
         item["upc"] = res.css(".table-striped tr:first-child > td::text").get()
         yield item
         # yield {
